@@ -19,4 +19,20 @@ module.exports = {
         }
         return n;
     },
+
+    applyTestFuncs: function(testFuncs, logValues) {
+        return data => {
+            var returnVal = data;
+            if(logValues){
+                console.log(returnVal.text)
+            }
+            testFuncs.forEach(funk => {
+                returnVal = funk(returnVal);
+                if(logValues){
+                    console.log(returnVal.text)
+                }
+            })
+            return returnVal;
+        }
+    }
 }

@@ -51,7 +51,10 @@
     "glob": "^7.1.2",
     "gray-matter": "^3.1.1",
     "html-to-text": "^4.0.0",
-    "showdown": "^1.8.6"
+    "remark-html": "^7.0.0",
+    "remark-parse": "^5.0.0",
+    "showdown": "^1.8.6",
+    "unified": "^6.1.6"
   },
   "ava": {
     "files": [

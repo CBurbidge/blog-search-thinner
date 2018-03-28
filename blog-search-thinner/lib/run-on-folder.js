@@ -39,6 +39,7 @@ glob(folder + "/**/*.md", (err, files) => {
     writeToFile("removedDupsAndCodeAndStop", removedDupsAndCodeAndStop);
 
     var stripper = thinner.getFrequentWordStripper(removedDupsAndCodeAndStop, 0.8);
+    stripper.writeToFile("C:\\Dev\\CBurbidge\\wc.json")
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
     writeToFile("removedDupsAndCodeAndStopStripped", stripped);
 

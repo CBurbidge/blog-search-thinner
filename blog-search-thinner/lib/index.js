@@ -5,23 +5,44 @@ const htmlToText = require('html-to-text');
 const matter = require('gray-matter');
 
 var converter = new showdown.Converter();
-converter.setFlavor('github');
+//converter.setFlavor('github');
 
-var markdownToHtml = function (markdown) {
-    return converter.makeHtml(markdown);
+var unified = require('unified');
+var markdown = require('remark-parse');
+var html = require('remark-html');
+var remarkHtml = unified()
+    .use(markdown)
+    .use(html)
+
+var markdownToHtml = function (post) {
+    //var text = converter.makeHtml(post.text)
+
+    var retVal = null;
+    var returned = false;
+    remarkHtml.process(post.text, function (err, file) {
+        if (err) throw err;
+        retVal = file;
+        returned = true;
+    });
+    while (returned === false){}
+    var text = retVal.contents;
+
+    return Object.assign({}, post, { text });
 };
 
-var cleanHtmlOfPreTags = function (html) {
-    var $ = cheerio.load(html);
+var cleanHtmlOfPreTags = function (post) {
+    var $ = cheerio.load(post.text);
     var minusPreTags = $("*").remove('pre');
-    var cleanHtml = $.html();
-    return cleanHtml;
+    var text = $.html();
+    return Object.assign({}, post, { text });
 }
 
-var removeHtml = function (html) {
-    return htmlToText.fromString(html);
+var removeHtml = function (post) {
+    var text = htmlToText.fromString(post.text)
+    return Object.assign({}, post, { text });
 }
 
+// todo make all post
 var removeCodeFromMarkdown = function (markdown) {
     return removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(markdown))))
 }
@@ -38,29 +59,38 @@ function splitByWords(text) {
     return wordsArray;
 }
 
-var removeStopWords = function (text) {
-    return splitByWords(text)
-        .filter(function (item) {
-            //return (stopWords.indexOf(item)) !== -1;
-            return stopWords.includes(item) === false;
-        }).join(' ')
+var filterOutDuplicates = function (element, index, array) {
+    var elementIsFirstTimeSeen = index === array.indexOf(element)
+    return elementIsFirstTimeSeen;
 }
-
-var removeDuplicates = function (text) {
+var filterOutStopWords = function (element, index, array) {
+    return stopWords.includes(element) === false;
+}
+var filterApply = function (text, filtersArg) {
+    var filters = filtersArg || [filterOutStopWords, filterOutDuplicates];
     return splitByWords(text)
-        .filter(function (item, i, allItems) {
-            return i == allItems.indexOf(item);
+        .filter(function (element, index, array) {
+            for (let func of filters) {
+                if (func(element, index, array) === false) {
+                    return false;
+                }
+            }
+            return true;
         }).join(' ');
 }
-
-var removeNonAlpha = function (text) {
-    var regex = /[^a-zA-Z0-9\-']/g
-    var justAlpha = text.replace(regex, " ")
-    return justAlpha.toLowerCase()
+var filterWords = function (post) {
+    var filteredText = filterApply(post.text, [filterOutStopWords, filterOutDuplicates])
+    return Object.assign(post, { text: filteredText })
 }
 
-var cleanText = function (text) {
-    return removeDuplicates(removeStopWords(removeNonAlpha(text)));
+var removeNonAlpha = function (post) {
+    var regex = /[^a-zA-Z0-9\-']/g
+    var justAlpha = post.text.replace(regex, " ")
+    return Object.assign(post, { text: justAlpha.toLowerCase() })
+}
+
+var cleanText = function (post) {
+    return filterWords(removeNonAlpha(post));
 }
 
 var removeHighlightCodeFromString = function (json) {
@@ -83,35 +113,29 @@ var fromMarkdownFile = function (filePath, encoding) {
     var enc = encoding || "utf-8"
     console.log("read file - " + filePath);
     var content = fs.readFileSync(filePath, enc);
-    var result = fromMarkdown(content);
-    return {
-        filePath: filePath,
-        text: result
-    }
+    var result = fromMarkdown({ text: content });
+    return result;
 }
 
 var fromHtmlFile = function (filePath, encoding) {
     var enc = encoding || "utf-8"
     console.log("read file - " + filePath);
     var content = fs.readFileSync(filePath, enc);
-    var result = fromHtml(content);
-    return {
-        filePath: filePath,
-        text: result
-    }
+    var result = fromHtml({ text: content });
+    return result;
 }
 
-var fromMarkdown = function (markdown) {
-    var postFrontMatter = matter(markdown);
-    var cleanContent = cleanText(removeCodeFromMarkdown(markdown))
+var fromMarkdown = function (post) {
+    var postFrontMatter = matter(post.text);
+    var cleanContent = cleanText(removeCodeFromMarkdown(post.text))
     return {
         frontmatter: postFrontMatter.data,
         text: cleanContent
     };
 }
 
-var fromHtml = function (html) {
-    var postFrontMatter = matter(html);
+var fromHtml = function (post) {
+    var postFrontMatter = matter(post.text);
     var cleanContent = cleanText(removeCodeFromHtml(postFrontMatter.content))
     return {
         frontmatter: postFrontMatter.data,
@@ -125,7 +149,7 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
         stringArray.forEach(function (text) {
             splitByWords(text).forEach(word => {
                 if (word in wordsMap === false) {
-                    wordsMap[word] = 0;
+                    wordsMap[word] = [];
                 }
             })
         });
@@ -137,12 +161,12 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
         var finalWordsArray = [];
         finalWordsArray = Object.keys(wordsMap).map(function (key) {
             return {
-                name: key,
-                total: wordsMap[key]
+                w: key,
+                c: wordsMap[key]
             };
         });
         finalWordsArray.sort(function (a, b) {
-            return b.total - a.total;
+            return b.c.length - a.c.length;
         });
         return finalWordsArray;
     }
@@ -152,17 +176,21 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
         removePercentage = 0.8;
     }
 
-    var limit = Math.floor((1 - removePercentage) * textArray.length);
+    var limit = Math.ceil((1 - removePercentage) * textArray.length);
     console.log("removing words which appear in more than " + limit + " of the posts");
 
     var allWordsMap = getAllWords(textArray);
     var allWords = Object.keys(allWordsMap);
+    var fileMeta = []
+    textArray.forEach((text, i) => {
 
-    textArray.forEach(text => {
+        // todo fix
+        fileMeta.push({ fileName: "filepath" + i })
+
         var split = splitByWords(text);
         allWords.forEach(word => {
             if (split.includes(word)) {
-                allWordsMap[word]++;
+                allWordsMap[word].push(i);
             }
         })
     })
@@ -184,9 +212,39 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
             }).join(' ')
     }
 
-    return {
-        remove: remove
+    var writeToFile = function (filePath) {
+        var strippedWords = Object.create(null);
+        Object.keys(allWordsMap).forEach(word => {
+            if (allWordsMap[word].length <= limit) {
+                strippedWords[word] = allWordsMap[word];
+            }
+        });
+
+        var data = {
+            files: fileMeta,
+            words: strippedWords
+        }
+        var toWrite = JSON.stringify(data);
+        fs.writeFile(filePath, toWrite, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            console.log("The file was saved! - " + filePath);
+        });
     }
+
+    return {
+        remove: remove,
+        writeToFile, writeToFile
+    }
+}
+
+var frontmatterToPostData = function (post) {
+    var postFrontMatter = matter(post.text);
+    post.frontmatter = postFrontMatter.data;
+    post.text = postFrontMatter.content;
+    return post;
 }
 
 // todo parse frontmatter for markdown and return
@@ -205,4 +263,22 @@ module.exports = {
     removeCodeAndStopWordsMarkdown: md => removeStopWords(removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(md))))),
     removeDupsAndCodeAndStopWordsMarkdown: md => cleanText(removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(md))))),
 
+
+
+
+    transform: {
+        htmlToText: removeHtml,
+        markdownToHtml: markdownToHtml,
+        frontmatterToPostData: frontmatterToPostData
+    },
+    remove: {
+        highlightCode: removeHighlightCodeFromString,
+        preTagsFromHtml: cleanHtmlOfPreTags
+    },
+    filter: {
+        outDuplicates: filterOutDuplicates,
+        outStopWords: filterOutStopWords,
+        applyToSplitText: filterApply,
+        text: filterWords
+    }
 }
