@@ -24,7 +24,7 @@ var markdownToHtml = function (post) {
         retVal = file;
         returned = true;
     });
-    while (returned === false){}
+    while (returned === false) { }
     var text = retVal.contents;
 
     return Object.assign({}, post, { text });
@@ -86,7 +86,11 @@ var filterWords = function (post) {
 var removeNonAlpha = function (post) {
     var regex = /[^a-zA-Z0-9\-']/g
     var justAlpha = post.text.replace(regex, " ")
-    return Object.assign(post, { text: justAlpha.toLowerCase() })
+    return Object.assign(post, { text: justAlpha })
+}
+
+var toLowerCase = function (post) {
+    return Object.assign(post, { text: post.text.toLowerCase() })
 }
 
 var cleanText = function (post) {
@@ -109,39 +113,6 @@ var removeHighlightCodeFromString = function (json) {
     return current;
 }
 
-var fromMarkdownFile = function (filePath, encoding) {
-    var enc = encoding || "utf-8"
-    console.log("read file - " + filePath);
-    var content = fs.readFileSync(filePath, enc);
-    var result = fromMarkdown({ text: content });
-    return result;
-}
-
-var fromHtmlFile = function (filePath, encoding) {
-    var enc = encoding || "utf-8"
-    console.log("read file - " + filePath);
-    var content = fs.readFileSync(filePath, enc);
-    var result = fromHtml({ text: content });
-    return result;
-}
-
-var fromMarkdown = function (post) {
-    var postFrontMatter = matter(post.text);
-    var cleanContent = cleanText(removeCodeFromMarkdown(post.text))
-    return {
-        frontmatter: postFrontMatter.data,
-        text: cleanContent
-    };
-}
-
-var fromHtml = function (post) {
-    var postFrontMatter = matter(post.text);
-    var cleanContent = cleanText(removeCodeFromHtml(postFrontMatter.content))
-    return {
-        frontmatter: postFrontMatter.data,
-        text: cleanContent
-    };
-}
 
 var getFrequentWordStripper = function (textArray, removePercentage) {
     function getAllWords(stringArray) {
@@ -247,38 +218,117 @@ var frontmatterToPostData = function (post) {
     return post;
 }
 
+var applyFuncs = function (testFuncs, logValues) {
+    return data => {
+        var returnVal = data;
+        if (logValues) {
+            console.log(returnVal.text)
+        }
+        testFuncs.forEach(funk => {
+            returnVal = funk(returnVal);
+            if (logValues) {
+                console.log(returnVal.text)
+            }
+        })
+        return returnVal;
+    }
+}
+
 // todo parse frontmatter for markdown and return
 
-module.exports = {
-    fromMarkdownFile: fromMarkdownFile,
-    fromHtmlFile: fromHtmlFile,
-    fromMarkdown: fromMarkdown,
-    fromHtml: fromHtml,
-    cleanText: cleanText,
+var configDefault = {
+    parseFrontmatter: true,
+    removeHighlightCode: true,
+    removePreTags: true,
+    removeStopWords: true,
+    removeDuplicates: true,
+    toLowercase: true
+};
 
-    getFrequentWordStripper: getFrequentWordStripper,
+module.exports = configArg => {
+    var config = Object.assign({}, configDefault, configArg)
+    var addToFuncsToRun = function (name, func, arr) {
+        if (name in config) {
+            var configVal = config[name];
+            if (configVal) {
+                arr.push(func);
+            }
+        } else {
+            arr.push(func);
+        }
+    }
 
-    removeNothingMarkdown: md => removeHtml(markdownToHtml(md)),
-    removeCodeMarkdown: md => removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(md)))),
-    removeCodeAndStopWordsMarkdown: md => removeStopWords(removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(md))))),
-    removeDupsAndCodeAndStopWordsMarkdown: md => cleanText(removeHtml(cleanHtmlOfPreTags(markdownToHtml(removeHighlightCodeFromString(md))))),
+    var preHtmlFuncs = []
+    addToFuncsToRun("parseFrontmatter", frontmatterToPostData, preHtmlFuncs);
+    addToFuncsToRun("removeHighlightCode", removeHighlightCodeFromString, preHtmlFuncs);
+
+    var postHtmlFuncs = []
+    addToFuncsToRun("toLowercase", toLowerCase, postHtmlFuncs);
+    addToFuncsToRun("removePreTags", cleanHtmlOfPreTags, postHtmlFuncs);
 
 
+    var filterFuncs = []
+    addToFuncsToRun("removeStopWords", filterOutStopWords, filterFuncs);
+    addToFuncsToRun("removeDuplicates", filterOutDuplicates, filterFuncs);
+    if (filterFuncs.length > 0) {
+        postHtmlFuncs.push(applyFuncs(filterFuncs))
+    }
+
+    var appliedPreHtmlFuncs = applyFuncs(preHtmlFuncs);
+    var appliedPostHtmlFuncs = applyFuncs(postHtmlFuncs);
+
+    var fromMarkdownFile = function (filePath, encoding) {
+        var enc = encoding || "utf-8"
+        console.log("read file - " + filePath);
+        var content = fs.readFileSync(filePath, enc);
+        var result = fromMarkdown({ text: content });
+        return result;
+    }
+
+    var fromHtmlFile = function (filePath, encoding) {
+        var enc = encoding || "utf-8"
+        console.log("read file - " + filePath);
+        var content = fs.readFileSync(filePath, enc);
+        var result = fromHtml({ text: content });
+        return result;
+    }
+
+    var fromMarkdown = function (post) {
+        var preHtml = appliedPreHtmlFuncs(post);
+        var asHtml = markdownToHtml(preHtml);
+        var postHtml = appliedPostHtmlFuncs(asHtml);
+        return postHtml;
+    }
+
+    var fromHtml = function (post) {
+        var preHtml = appliedPreHtmlFuncs(post);
+        var postHtml = appliedPostHtmlFuncs(preHtml);
+        return postHtml;
+    }
 
 
-    transform: {
-        htmlToText: removeHtml,
-        markdownToHtml: markdownToHtml,
-        frontmatterToPostData: frontmatterToPostData
-    },
-    remove: {
-        highlightCode: removeHighlightCodeFromString,
-        preTagsFromHtml: cleanHtmlOfPreTags
-    },
-    filter: {
-        outDuplicates: filterOutDuplicates,
-        outStopWords: filterOutStopWords,
-        applyToSplitText: filterApply,
-        text: filterWords
+    return {
+        fromMarkdownFile: fromMarkdownFile,
+        fromHtmlFile: fromHtmlFile,
+        fromMarkdown: fromMarkdown,
+        fromHtml: fromHtml,
+
+        getFrequentWordStripper: getFrequentWordStripper,
+
+        transform: {
+            htmlToText: removeHtml,
+            markdownToHtml: markdownToHtml,
+            frontmatterToPostData: frontmatterToPostData
+        },
+        remove: {
+            highlightCode: removeHighlightCodeFromString,
+            preTagsFromHtml: cleanHtmlOfPreTags
+        },
+        filter: {
+            outDuplicates: filterOutDuplicates,
+            outStopWords: filterOutStopWords,
+            applyToSplitText: filterApply,
+            text: filterWords
+        }
     }
 }

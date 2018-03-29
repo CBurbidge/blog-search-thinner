@@ -1,9 +1,10 @@
 const fs = require('fs');
 import test from 'ava'
-import * as lib from '../../lib/index'
+const libFunc = require('../../lib/index')
 import * as util from './testUtils'
 
 test('removes code from posts', (t) => {
+  var lib = libFunc()
   var goodPaths = ["./test/posts/2016-12-22-powershell-error-handling.md"]
   var posts = goodPaths.map(x => {
     return {

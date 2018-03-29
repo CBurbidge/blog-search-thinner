@@ -1,7 +1,8 @@
 import test from 'ava'
-import * as lib from '../../lib/index'
+const libFunc = require('../../lib/index')
 const examples = require('./examples')
 const testUtils = require('./testUtils')
+var lib = libFunc();
 
 test('removes duplicate words from markdown', (t) => {
   var filteredPost = lib.filter.text({

@@ -1,5 +1,6 @@
 import test from 'ava'
-import * as lib from '../../lib/index'
+const libFunc = require('../../lib/index')
+var lib = libFunc();
 
 test('parses frontmatter for markdown', (t) => {
   var result = lib.transform.frontmatterToPostData({
