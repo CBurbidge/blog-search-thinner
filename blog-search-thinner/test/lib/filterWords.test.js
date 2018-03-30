@@ -4,9 +4,10 @@ const examples = require('./examples')
 const testUtils = require('./testUtils')
 var lib = libFunc();
 
+var func = x => lib.filter.applyToSplitText(x, [lib.filter.outDuplicates, lib.filter.outStopWords])
+
 test('removes duplicate words from markdown', (t) => {
-  var filteredPost = lib.filter.text({
-    text: `
+  var filteredPost = func({text:`
   ### some title
   she sells sea shells on the sea shore
   `});
@@ -16,8 +17,7 @@ test('removes duplicate words from markdown', (t) => {
 });
 
 test('removes common stop words from markdown', (t) => {
-  var filteredPost = lib.filter.text({
-    text: `
+  var filteredPost = func({text: `
 ----
 title: some great title
 ----
