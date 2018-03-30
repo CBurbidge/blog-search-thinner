@@ -1,6 +1,6 @@
 const fs = require('fs');
 const glob = require('glob');
-const thinner = require('./index');
+const thinnerFunc = require('./index');
 
 var folder = process.argv.slice(2)[0];
 console.log("folder - " + folder);
@@ -23,22 +23,66 @@ var writeToFile = function (fileName, data) {
     });
 }
 
+var configDefault = {
+    parseFrontmatter: true,
+    removeHighlightCode: true,
+    removePreTags: true,
+    removeStopWords: true,
+    removeDuplicates: true,
+    toLowercase: true
+};
+
+var thinnerRemovesNothing = thinnerFunc(Object.assign({}, configDefault, {
+    parseFrontmatter: false,
+    removeHighlightCode: false,
+    removePreTags: false,
+    removeStopWords: false,
+    removeDuplicates: false,
+    toLowercase: false
+}));
+
+var thinnerRemovesCode = thinnerFunc(Object.assign({}, configDefault, {
+    parseFrontmatter: false,
+    removeHighlightCode: true,
+    removePreTags: true,
+    removeStopWords: false,
+    removeDuplicates: false,
+    toLowercase: false
+}));
+
+var thinnerRemovesCodeAndStopWords = thinnerFunc(Object.assign({}, configDefault, {
+    parseFrontmatter: false,
+    removeHighlightCode: true,
+    removePreTags: true,
+    removeStopWords: true,
+    removeDuplicates: false,
+    toLowercase: true
+}));
+
+var thinnerRemovesCodeAndStopWordsAndDuplicates = thinnerFunc(Object.assign({}, configDefault, {
+    parseFrontmatter: false,
+    removeHighlightCode: true,
+    removePreTags: true,
+    removeStopWords: true,
+    removeDuplicates: true,
+    toLowercase: true
+}));
+
 glob(folder + "/**/*.md", (err, files) => {
     var goodPaths = files.filter(x => isBadFilePath(x) === false);
 
-    var fileContents = goodPaths.map(x => fs.readFileSync(x, "utf-8"));
-
-    var removedNothing = fileContents.map(x => thinner.removeNothingMarkdown(x));
-    var removedCode = fileContents.map(x => thinner.removeCodeMarkdown(x));
-    var removedCodeAndStop = fileContents.map(x => thinner.removeCodeAndStopWordsMarkdown(x));
-    var removedDupsAndCodeAndStop = fileContents.map(x => thinner.removeDupsAndCodeAndStopWordsMarkdown(x));
+    var removedNothing =            goodPaths.map(x => thinnerRemovesNothing.fromFile(x));
+    var removedCode =               goodPaths.map(x => thinnerRemovesCode.fromFile(x));
+    var removedCodeAndStop =        goodPaths.map(x => thinnerRemovesCodeAndStopWords.fromFile(x));
+    var removedDupsAndCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWordsAndDuplicates.fromFile(x));
 
     writeToFile("removedNothing", removedNothing);
     writeToFile("removedCode", removedCode);
     writeToFile("removedCodeAndStop", removedCodeAndStop);
     writeToFile("removedDupsAndCodeAndStop", removedDupsAndCodeAndStop);
-
-    var stripper = thinner.getFrequentWordStripper(removedDupsAndCodeAndStop, 0.8);
+    
+    var thinner = thinnerFunc()
+    var stripper = thinner.getPercentageStripper(removedDupsAndCodeAndStop, 0.8);
     stripper.writeToFile("C:\\Dev\\CBurbidge\\wc.json")
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
     writeToFile("removedDupsAndCodeAndStopStripped", stripped);
@@ -83,6 +127,6 @@ glob(folder + "/**/*.md", (err, files) => {
 
     wordCountToFile("removedDupsAndCodeAndStopCount", JSON.stringify(removedDupsAndCodeAndStop));
     wordCountToFile("removedDupsAndCodeAndStopCountStripped", JSON.stringify(stripped));
-    
+
 });
 

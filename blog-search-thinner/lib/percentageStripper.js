@@ -41,14 +41,13 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
 
     var limit = Math.ceil((1 - removePercentage) * textArray.length);
     console.log("removing words which appear in more than " + limit + " of the posts");
-
-    var allWordsMap = getAllWords(textArray);
+    var fileMeta = textArray.map(x => {
+        return Object.assign({}, x, {text: ""})
+    });
+    var asJsonArray = textArray.map(x => JSON.stringify(x))
+    var allWordsMap = getAllWords(asJsonArray);
     var allWords = Object.keys(allWordsMap);
-    var fileMeta = []
-    textArray.forEach((text, i) => {
-
-        // todo fix
-        fileMeta.push({ fileName: "filepath" + i })
+    asJsonArray.forEach((text, i) => {
 
         var split = splitByWords(text);
         allWords.forEach(word => {
@@ -68,11 +67,12 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
     console.log("words to remove")
     console.log(wordsOverLimitToRemove)
 
-    var remove = function (text) {
-        return splitByWords(text)
+    var remove = function (post) {
+        var removed = splitByWords(post.text)
             .filter(function (item) {
                 return (wordsOverLimitToRemove.includes(item)) === false;
             }).join(' ')
+        return Object.assign({}, post, { text: removed })
     }
 
     var writeToFile = function (filePath) {
