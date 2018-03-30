@@ -1,3 +1,32 @@
+import test from 'ava'
+const libFunc = require('../../lib/index')
+
+var lib = libFunc()
+
+test('removes highlight javascript code from markdown', (t) => {
+  var result = lib.remove.highlightCode({ text: markdownWithCode });
+
+  var doesntContainHighlight = result.text.indexOf("highlight") === -1;
+
+  t.truthy(doesntContainHighlight);
+});
+
+test('removes pre tags from html', (t) => {
+  var htmlWithPreTags = `
+  <div>
+    <p>hello</p>
+    <p>world</p>
+    <pre>some code is here</pre>
+  </div>
+`
+  var result = lib.remove.preTagsFromHtml({ text: markdownWithCode });
+
+  var doesntContainHighlight = result.text.indexOf("some code") === -1;
+
+  t.truthy(doesntContainHighlight);
+});
+
+
 var markdownWithCode = `
 a
 through it below and explain what's going on.
@@ -36,27 +65,3 @@ var bollinger = sl.series.bollinger()
 {% endhighlight %}
 
  the component`
-
-var markdownWithoutCode = `
-a
-through it below and explain what's going on.
-
-
-
-That's a decent amount of code, so let's start at the top by looking at the properties.
-
-
-
-Adding the component to the chart
-
-First we create and configure our component:
-
-
-
-the component`
-
-
-module.exports = {
-    markdownWithCode: markdownWithCode,
-    markdownWithoutCode: markdownWithoutCode
-}
