@@ -7,7 +7,7 @@ const path = require('path');
 test('removes code from posts', t => {
   var lib = libFunc()
   var filePath = path.resolve(__dirname + "/../posts/cburbidge/2016-12-22-powershell-error-handling.md")
-  var x = lib.fromMarkdownFile(filePath)
+  var x = lib.fromFile(filePath)
   
 
   t.truthy(x.text.indexOf("Write-Error") === -1);

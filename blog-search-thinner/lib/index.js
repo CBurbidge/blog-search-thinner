@@ -172,6 +172,17 @@ module.exports = configArg => {
         return result;
     }
 
+    var fromFile = function (filePath, encoding){
+        var ext = path.extname(filePath);
+        if(ext === ".md"){
+            return fromMarkdownFile(filePath, encoding);
+        }
+        if(ext === ".html"){
+            return fromHtmlFile(filePath, encoding);
+        }
+        console.log("Error, cant process extension - " + ext);
+    }
+
     var fromMarkdown = function (post) {
         var preHtml = appliedPreHtmlFuncs(post);
         var asHtml = transformMarkdownToHtml(preHtml);
@@ -186,12 +197,13 @@ module.exports = configArg => {
     }
 
     return {
-        fromMarkdownFile: fromMarkdownFile,
-        fromHtmlFile: fromHtmlFile,
-        fromMarkdown: fromMarkdown,
-        fromHtml: fromHtml,
+        fromFile,
+        fromMarkdownFile,
+        fromHtmlFile,
+        fromMarkdown,
+        fromHtml,
 
-        getPercentageStripper: getPercentageStripper,
+        getPercentageStripper,
 
         transform: {
             htmlToText: transformHtmlToText,
