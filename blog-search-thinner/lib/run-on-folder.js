@@ -11,10 +11,11 @@ let isBadFilePath = function (filePath) {
         || filePath.indexOf("/scss/") !== -1
         || filePath.indexOf("/README.md") !== -1
 };
+var baseDir = "C:\\Dev\\CBurbidge\\WordCount\\";
 
 var writeToFile = function (fileName, data) {
     var toWrite = JSON.stringify(data);
-    fs.writeFile("C:\\Dev\\CBurbidge\\" + fileName + ".json", toWrite, function (err) {
+    fs.writeFile(baseDir + fileName + ".json", toWrite, function (err) {
         if (err) {
             return console.log(err);
         }
@@ -68,24 +69,24 @@ var thinnerRemovesCodeAndStopWordsAndDuplicates = thinnerFunc(Object.assign({}, 
     toLowercase: true
 }));
 
-glob(folder + "/**/*.md", (err, files) => {
+var writeFiles = function (files) {
     var goodPaths = files.filter(x => isBadFilePath(x) === false);
 
-    var removedNothing =            goodPaths.map(x => thinnerRemovesNothing.fromFile(x));
-    var removedCode =               goodPaths.map(x => thinnerRemovesCode.fromFile(x));
-    var removedCodeAndStop =        goodPaths.map(x => thinnerRemovesCodeAndStopWords.fromFile(x));
+    var removedNothing = goodPaths.map(x => thinnerRemovesNothing.fromFile(x));
+    //var removedCode = goodPaths.map(x => thinnerRemovesCode.fromFile(x));
+    //var removedCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWords.fromFile(x));
     var removedDupsAndCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWordsAndDuplicates.fromFile(x));
+    var numFiles = files.length
+    writeToFile(numFiles + "_removedNothing", removedNothing);
+    //writeToFile(numFiles + "_removedCode", removedCode);
+    //writeToFile(numFiles + "_removedCodeAndStop", removedCodeAndStop);
+    writeToFile(numFiles + "_removedDupsAndCodeAndStop", removedDupsAndCodeAndStop);
 
-    writeToFile("removedNothing", removedNothing);
-    writeToFile("removedCode", removedCode);
-    writeToFile("removedCodeAndStop", removedCodeAndStop);
-    writeToFile("removedDupsAndCodeAndStop", removedDupsAndCodeAndStop);
-    
     var thinner = thinnerFunc()
     var stripper = thinner.getPercentageStripper(removedDupsAndCodeAndStop, 0.8);
-    stripper.writeToFile("C:\\Dev\\CBurbidge\\wc.json")
+    stripper.writeToFile(baseDir + numFiles + "_wc.json")
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
-    writeToFile("removedDupsAndCodeAndStopStripped", stripped);
+    writeToFile(numFiles + "_removedDupsAndCodeAndStopStripped", stripped);
 
 
     var wordCountToFile = function (fileName, text) {
@@ -125,8 +126,24 @@ glob(folder + "/**/*.md", (err, files) => {
         writeToFile(fileName, finalWordsArray);
     }
 
-    wordCountToFile("removedDupsAndCodeAndStopCount", JSON.stringify(removedDupsAndCodeAndStop));
-    wordCountToFile("removedDupsAndCodeAndStopCountStripped", JSON.stringify(stripped));
+    // wordCountToFile(numFiles + "_removedDupsAndCodeAndStopCount", JSON.stringify(removedDupsAndCodeAndStop));
+    // wordCountToFile(numFiles + "_removedDupsAndCodeAndStopCountStripped", JSON.stringify(stripped));
 
+}
+
+function range1(i) { return i ? range1(i - 1).concat(i) : [] }
+
+glob(folder + "/**/*.md", (err, mdFiles) => {
+    glob(folder + "/**/*.html", (err, htmlFiles) => {
+        var files = mdFiles.concat(htmlFiles)
+        var range = range1(files.length);
+        var limit = 21
+        var intervals = range.filter(x => x % limit === 0 && x !== 0)
+        intervals.forEach(x => {
+            console.log("run for - " + x)
+            var subsetOfFiles = files.slice(0, x)
+            writeFiles(subsetOfFiles)
+        });
+    });
 });
 

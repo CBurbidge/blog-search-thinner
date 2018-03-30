@@ -56,22 +56,26 @@ var getFrequentWordStripper = function (textArray, removePercentage) {
             }
         })
     })
-
+    
     var sortedTotals = projectAndSort(allWordsMap)
-    var wordsOverLimitToRemove = sortedTotals
-        .filter(x => x.total > limit)
-        .map(x => x.name);
+    
+    //console.log(JSON.stringify(sortedTotals))
 
-    console.log("allWords")
-    console.log(allWords)
-    console.log("words to remove")
-    console.log(wordsOverLimitToRemove)
+    var wordsOverLimitToRemove = sortedTotals
+        .filter(x => x.c.length > limit)
+        .map(x => x.w);
+
+    // console.log("allWords")
+    // console.log(allWords)
+    //console.log("words to remove")
+    //console.log(JSON.stringify(wordsOverLimitToRemove))
 
     var remove = function (post) {
         var removed = splitByWords(post.text)
             .filter(function (item) {
                 return (wordsOverLimitToRemove.includes(item)) === false;
-            }).join(' ')
+            })
+            .join(' ')
         return Object.assign({}, post, { text: removed })
     }
 
