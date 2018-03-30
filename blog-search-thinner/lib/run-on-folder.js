@@ -1,6 +1,7 @@
 const fs = require('fs');
 const glob = require('glob');
 const thinnerFunc = require('./index');
+const lunr = require('lunr');
 
 var folder = process.argv.slice(2)[0];
 console.log("folder - " + folder);
@@ -88,6 +89,21 @@ var writeFiles = function (files) {
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
     writeToFile(numFiles + "_removedDupsAndCodeAndStopStripped", stripped);
 
+    var getIndex = function(docs){
+        return lunr(function () {
+            this.ref('path')
+            this.field('text')
+    
+            docs.forEach(function (doc) {
+                this.add(doc)
+            }, this)
+        })
+    }
+
+    
+    writeToFile(numFiles + "_removedNothingIndex", getIndex(removedNothing));
+    writeToFile(numFiles + "_removedDupsAndCodeAndStopStrippedIndex", getIndex(stripped));
+    
 
     var wordCountToFile = function (fileName, text) {
         function splitByWords(text) {
@@ -137,7 +153,7 @@ glob(folder + "/**/*.md", (err, mdFiles) => {
     glob(folder + "/**/*.html", (err, htmlFiles) => {
         var files = mdFiles.concat(htmlFiles)
         var range = range1(files.length);
-        var limit = 21
+        var limit = 25
         var intervals = range.filter(x => x % limit === 0 && x !== 0)
         intervals.forEach(x => {
             console.log("run for - " + x)
