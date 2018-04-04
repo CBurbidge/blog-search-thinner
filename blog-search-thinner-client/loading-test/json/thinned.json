@@ -1,0 +1,86 @@
+[
+    {
+        "path": "./test/posts/cburbidge/2015-11-15-things-learnt-during-first-app.md",
+        "text": " app things learnt whilst phone 5 mvvmcross windows mobile recently finished experience vvm framework xaml stack learned developing obvious app's purpose data events happening bristol entry page 'pivot' style corresponds date shows summary day user tap event information venue price headliners dynamic pivot view headers days displayed list swipe right left change generated dynamically development summaries displaying header type model instead 'monday 2nd' 'dateviewmodel' turns forgotten implement headertemplate wasn't documentation reading needed implemented resuming behaviour starting pick don't understand general navigation good example unexpected exception thrown couldn't related navigate mainpage deleted recommended examples changing wmappmanifest xml defaulttask element didn't really satisfactory fix stop exceptions crashes method overflow overwrote onnavigatedto called navigationservice goback navigated immediately calls button return previous leads weird means doesn't crash designing cross platform intend create point extending apps multiple platforms viewmodel structure names relate refer control obviously design context best naming conventions applicable specific"
+    },
+    {
+        "path": "./test/posts/cburbidge/2015-12-07-codeclub-examples.md",
+        "text": " codeclub examples counting different languages 6 f scratch python 10 programming mit edu 90544713 editor dotnetfiddle net yytqx3 vri351 trinket library trinkets 8a818948b5"
+    },
+    {
+        "path": "./test/posts/cburbidge/2015-4-3-First-post.md",
+        "text": " creating blog 1 jekyll hello today born forking fabulous repository barryclark i'll personalise"
+    },
+    {
+        "path": "./test/posts/cburbidge/2015-4-4-setting-up-blog.md",
+        "text": " blog away setting 2 jekyll coder that's fairly responsibility experiences setup express opinions things know internet needs blog? wanted option free fun set platform snippets ideally syntax highlighting languages write read articles blogs hosted sort platforms geekswithblogs good solution widely people discover disadvantages didn't markdown googlin' led jekyllrb specifically www jekyllnow static site generator converts html easily skeleton fact close account likely overlap point net programmer prior exposure ruby world expect thought i'd monkey analyse style place hyde chosen customise experience liking includes changing styling needed sass provided requires knowledge effect honest pretty happy trying version challenge tried install devkit windows machine got far errors carry sure don't really waste weekend running booted linux vm old macbook pro figure locally mac crazy case gem pages serve terminal runs instance localhost 4000 browsed amazed config yml gives options sorts accounts social networks settings tag changes blew addition disqus signing service adding 'short name' magic come slight paying syn tax s div highlighted isn't quite right classes marked names shouldn't works does certainly complaining colours whack compared visual studio's defaults expected doubt change changed overall greatly impressed excited starting"
+    },
+    {
+        "path": "./test/posts/cburbidge/2015-5-11-refactoring-typed-config.md",
+        "text": " refactoring typed configuration net configurationmanager calls properties 4 reading recently getting pretty sick pattern checks setting \"somesetting\" exists uses value crime ask? don't repetition string literal prone speelling missteaks lead problems changes likely means duplication null check existence solution wanted wrap class exposes property instantiation stores called static advantage usages searching attempt allowing readable different typeof saw someint accessed parsed int wouldn't nice already? remove extra parsing required accessing given app config projectsettings classes bool somebool types can't expressing case throw exception generics produce ness type visual studio alt images png nest wrapping sort settings related example lots bring order cohesion fig clusion isn't thing v2 msdn microsoft en library 8eyb2ct1 aspx maintaining base making things little cleaner"
+    },
+    {
+        "path": "./test/posts/cburbidge/2015-5-8-c-sharp-highlighting.md",
+        "text": " letting defining colours syntax highlighting jekyll 3 blog sass lucky say workhorse language currently isn't quite visual studio spent trying make colour sets align results blob master highlights csharp scss case helps position"
+    },
+    {
+        "path": "./test/posts/cburbidge/2016-01-03-git-commit-powershell-function.md",
+        "text": " git flow committing make little easier 7 sort years resolution command general purpose trying supe profile unnecessary fun ways uses source control hosting jira workflow things sync item number takes message argument finds branch worked extracts convention defined regex commits jiraitem e g proj 123 stuff isn't asks user input proceeds 'y' \"some commit message\" i'll soon blogging setup thought deserved p s follow www howtogeek 50236 customizing"
+    },
+    {
+        "path": "./test/posts/cburbidge/2016-01-12-powershell-profile.md",
+        "text": " profile details super duper 8 sort years resolution command general spent customising requirements needs install automatic little change easily editable available home customisable environment sync dropbox stay date instead link effort make sure forgotten machine accidentally end product repository powershellprofile i'll explain ideas changes installation 'install' process adding lines profileshared ps1 relevant profilework profilehome \\addfilestoprofile doesn't running addfilestoprofile script does following things finds figures looking creates exist timestamp archives exists adds references import edit ise cd's startingdir variable set times wanted effect newly backed directory contains logic shared contain bits specific environments places urls profilelist idea provide list commands aliases brief description saving hashtable listaddcommand include viewed profileplaces quickly access folders simple created stores paths folder locations functions goto uses calls explorer exe place argument frequently visual studio example similarly profileurls quick commonly web pages opens chrome presented value hashmap going calling gh note 'com' git commit alias status shortened gs work|home variables customise don't sense conclusion current certainly think cool hope helps"
+    },
+    {
+        "path": "./test/posts/cburbidge/2016-03-19-debugger-display-trick.md",
+        "text": " debugger trick generating test data 9 testing generation day properly write tdd manner lack existing coverage tight coupling components constraints mean strategy required recently maintaining serialised xml objects loaded database fairly simple couple string properties detailing values table names produced 10 100s wanted quickly tests produce hand doing visual studio locals window debuggerdisplay attribute allows change object seen whilst debugging collection type instead seeing summary specifying advantage todisplay set property class holds representation constructor needed make example \" | attempt escape obviously break contains character select rows right click copy value selected images png contents delete quote replace instantiates assert saved string's wouldn't escaped"
+    },
+    {
+        "path": "./test/posts/cburbidge/2016-12-04-pslog.md",
+        "text": " pslog logging functions 10 monitoring structured lately learning generally loving configuring servers applications aggregator service goodness therin scripts compress archive log s3 ended beast deployed needs appropriate operational purposes silent solve small script provide basic text based json formatted idea api heavily inspired great library serilog simplifications 3 main info warning error takes string message argument optional props hashmap properties serialise importing dot notation \\path\\to\\pslog ps1 setting pslogfilepath path hard drive set logname property assigning value variable pslogname serialised included passing optionally hash map \"some application\" @ somenumber someothernumber 20 produces \"timestamp\" \"2016 01 01t12 34 56 123456+00 00\" \"level\" \"info\" \"message\" \"someothernumber\" \"somenumber\" \"logname\" \"somelogname\" \"host\" host\" reaches 50mb 'roll over' stamp date write original gaining insight production systems maybe help"
+    },
+    {
+        "path": "./test/posts/cburbidge/2016-12-22-powershell-error-handling.md",
+        "text": " error handling methods detection errors 11 patterns working hard lately having extra curricular fun nature fact basically does effect means really careful variety programs interacts knowing decent essential catch method similar programming languages relatable people normal pattern wrap dangerous block handle advantages widely known dues proliferation blocks long required span multiple lines disadvantages works terminating msdn microsoft en library dd878319 v vs 85 aspx likely come non changed setting erroraction command stop lastexitcode calls calling external program executables finished return exit stores variable interrogated successful codes vary general 0 indicates failed externally elegent requires detailed knowledge concept know collection happens execution behaviour erroring indicating occurred cleared items clear check immediately afterward correct main disadvantage hack y implement latest"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-01-04-log-file-convention.md",
+        "text": " log convention simple 12 logging devops trivial lately thinking sensible naming text company 10 15 different servers multiple 'environments' dev production look know environment date logs contains <driveletter>\\logging\\<projectname>\\<subprojectname>\\<environment>\\<projectname> <subprojectname> <environment> <date yyyymmdd> meetings means easier archive chronological origin looking archiving amazon s3 recently archived 65 000 non standardised locations someproject typically \\software\\someprojectlogging\\log debug log2016 01 02 rolling daily basis tricky single bucket experience clashes rename existing script gist 43c4a852f8caabb7e2e5da6cb4280bba similar situation"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-01-05-let-them-use-cake.md",
+        "text": " let cake ideas making switch build easier 13 devops continuous integration nuget teamcity ci server we've success issues logic starting cause problems lack source control standard audit feature better git inabiliy locally form configuration templates means builds machines makes hard replicate www thoughtworks radar techniques programming cd tool development feedback testing takes order minutes seconds fact place test changes broken type good sharing come learning curve non steps team don't know unclear dependencies formal specifying uses involved custom 3rd party tools libraries vendor lock company wanted change product aws amazon blogs codebuild fully managed service implement descriptions martinfowler articles continuousintegration html having single script does goes idea solutions solve there's cakebuild net dsl designed intention scripts roslyn borrows rake ruby fake fsharp solved describing list overcome solution justify effort important matches current setup terms functionality following features remain common 10 share commonality parameter values needs results metrics displaying information automated coverage logs replace template storing versioning easily import external csx load directive functions doing package contain contains considered 'public api' bumped changed choose directory folder basic ps1 config live base repository install correct ignore aren't renamed destination gitignore nunit tests 2 3 built runner shows benchmark meet nunit3 achieve flag nunit3settings class api 7bd0c6da set called nunit2 believe think case importing testresults xml produces report 'build feature' confluence jetbrains tcd10 xml+report+processing downside happen conclusion great methods notch orchestration store needed"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-01-22-path-display-function.md",
+        "text": " psfom january path value environment variable 14 check values included env provides access information semi colon joined string tricky read easily split ' seperated list long hard having filtering allows running passing easiest profile"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-01-22-powershell-function-of-the-month.md",
+        "text": " month 15 psfom big fan write help day plan record page january path environment variable hmm jump april nuget cache deleting nuke"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-04-09-nuke-get.md",
+        "text": " psfom april nuget cache deleting delete caches 16 packages lately promote best practices build deployment multiple places machine lead confusion stale package instead proper built ci server regularly simple requires executable path easiest profile"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-04-17-python-lambda-structure.md",
+        "text": " structure python aws lambda functions example 17 making lately small automation tasks gluing different services downsides lambdas tight coupling trying locally easily stepped developing called somelambda consists 3 index py runlocal logic exposes handler impl event context required dependencies having advantages debug machine document shape s object going monkey punch allow inversion control safety running contains main method runs real instantiated append git commit hash commented end know version installed looking console complex? extreme separate combined imported chosen stops possibility people editing window changes proper cd pipeline does idea versioning form rest conclusion success deploying format hope helps make class citizen development workflow"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-06-11-testing-filestreams.md",
+        "text": " testing stream streams tricks test hitting disk 18 adding unit coverage uses streaming approach write potentially big tempting rely integration tests convenience having mock prefer speed control mocking framework moq combined abstractions tathamoddie library calls ran trying developed trick seen documented open reading method create streamwriter class setup pass capture information net memorystream store streamreader read result running error argumentexception 'stream readable ' disposed end statement solve created called copyingmemorystream derives overrides copies bytes stringbuilder byte char conversion assert property passes think nice solution described helped"
+    },
+    {
+        "path": "./test/posts/cburbidge/2017-12-20-npm-package-I.md",
+        "text": " npm package festive game spot difference 19 javascript latest led finding interesting named promises import problems away linked brittanica blob master index js innocent images png viewed runkit yields sinister intention tries spin process command rm rf luckily systems saved trusty preserve root failsafe published looking metadata registry npmjs shows 3 releases 1st april 2017 guessing fairly nilhistic fools joke care choosing party modules repositories"
+    },
+    {
+        "path": "./test/posts/cburbidge/2018-02-27-typosquatters-post.md",
+        "text": " hunting typosquatters npm blog published scott logic 20 javascript package excited say 'hunting npm' technical scottlogic 2018 02 27 html gives closure personal months glad didn't fall finally finished"
+    },
+    {
+        "path": "./test/posts/cburbidge/2018-03-14-fsharp-bristol-talk.md",
+        "text": " f bristol talk 'hunting typosquatters ' 21 npm debuted meetup tonight excited share group pleased execution reaction hopefully helped spread good news language wonderful features i'd thank organisers opportunity beer pizza"
+    }
+]

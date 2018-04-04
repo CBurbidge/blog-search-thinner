@@ -152,8 +152,9 @@ function range1(i) { return i ? range1(i - 1).concat(i) : [] }
 glob(folder + "/**/*.md", (err, mdFiles) => {
     glob(folder + "/**/*.html", (err, htmlFiles) => {
         var files = mdFiles.concat(htmlFiles)
+        console.log("total files found: " + files.length)
         var range = range1(files.length);
-        var limit = 25
+        var limit = 21
         var intervals = range.filter(x => x % limit === 0 && x !== 0)
         intervals.forEach(x => {
             console.log("run for - " + x)
