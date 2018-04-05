@@ -17,6 +17,8 @@ var repoDir = (path.resolve(path.dirname(__filename) + "/../../")) + "\\";
 var baseDir = repoDir + "results/"
 var allDir = baseDir + "all/"
 
+var clientTestDir = repoDir + "blog-search-thinner-client/loading-test/json/"
+
 console.log("baseDir - " + baseDir);
 
 var writeToFile = function (dir, name, data) {
@@ -87,6 +89,7 @@ var writeFiles = function (files) {
     //stripper.writeToFile(allDir + numFiles + "_WordCount.json")
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
     writeToFile(allDir, numFiles + "_RemovedWasteAndPercentage", stripped);
+    writeToFile(clientTestDir, "Posts_" + numFiles, stripped);
 
     var getIndex = function (docs) {
         return lunr(function () {

@@ -83,7 +83,21 @@ $(function () {
         }
     }
 
-    var results = runForPosts("json/thinned.json", 21);
-    var resultsString = formatString(results);
-    $('#results').append("<p> " + resultsString + " </p>");
+    var runForPostNum = function(postNum){
+        return runForPosts("json/Posts_" + postNum + ".json", postNum);
+    }
+    
+    function range1(i) { return i ? range1(i - 1).concat(i) : [] }
+    var limit = 10
+    var max = 400
+    var range = range1(max + 2);
+    var postNums = range.filter(x => x % limit === 0 && x !== 0 && x <= max)
+    
+    postNums.forEach(x => {
+        var results = runForPostNum(x);
+        var resultsString = formatString(results);
+        $('#results').append("<p> " + resultsString + " </p>");
+    })
+
+    
 });
