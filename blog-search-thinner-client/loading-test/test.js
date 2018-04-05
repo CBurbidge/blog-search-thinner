@@ -26,55 +26,64 @@ $(function () {
         return idx;
     }
 
+    var formatString = x => {
+        return x.numPosts + "," +
+            x.timeOfDownloading + "," +
+            x.timeToDownloaded + "," +
+            x.timeOfIndexing + "," +
+            x.timeToIndexed + "," +
+            x.timeOfTenSearches + "," +
+            x.timeToTenSearches
+    }
+
     var runForPosts = function (fileName, numPosts) {
         var preDownload = performance.now();
+        var returned = false
 
+        var timeToDownloaded, timeOfDownloading, timeToIndexed, timeOfIndexing, timeToTenSearches, timeOfTenSearches = undefined;
+        
+        $.ajaxSetup({
+            async: false
+        });
+
+        console.log("fetching data - " + fileName)
         $.getJSON(fileName, function (data) {
+            console.log("fetched data")
+            returned = true
             var postDownload = performance.now();
 
             var thinned = data;
             var thinned = indexJson(thinned);
             var postIndexed = performance.now();
-            
-            thinned.search("today")
-            thinned.search("is")
-            thinned.search("gonna be the day")
-            thinned.search("That they're gonna")
-            thinned.search("throw  ")
-            thinned.search("it back to you")
-            thinned.search("By now")
-            thinned.search("you should've somehow")
-            thinned.search("Realized what")
-            thinned.search("you")
-            
+
+            thinned.search("today"); thinned.search("is"); thinned.search("gonna be the day");
+            thinned.search("That they're gonna"); thinned.search("throw  "); thinned.search("it back to you");
+            thinned.search("By now"); thinned.search("you should've somehow"); thinned.search("Realized what"); thinned.search("you");
+
             var postTenSearchs = performance.now()
 
-            var timeToDownloaded = Math.ceil(postDownload - preDownload)
-            var timeOfDownloading = Math.ceil(postDownload - preDownload)
+            timeToDownloaded = Math.ceil(postDownload - preDownload)
+            timeOfDownloading = Math.ceil(postDownload - preDownload)
 
-            var timeToIndexed = Math.ceil(postIndexed - preDownload)
-            var timeOfIndexing = Math.ceil(postIndexed - postDownload)
+            timeToIndexed = Math.ceil(postIndexed - preDownload)
+            timeOfIndexing = Math.ceil(postIndexed - postDownload)
 
-            var timeToTenSearches = Math.ceil(postTenSearchs - preDownload)
-            var timeOfTenSearches = Math.ceil(postTenSearchs - postIndexed)
-            
-            // console.log("Downloading - " + timeOfDownloading + ", total - " + timeToDownloaded);
-            // console.log("Indexing - " + timeOfIndexing + ", total - " + timeToIndexed);
-            // console.log("Performed 10 searches - " + timeOfTenSearches + ", total - " + timeToTenSearches);
-            var resultsString = numPosts + "," + timeOfDownloading + "," + timeToDownloaded + "," + timeOfIndexing + "," + timeToIndexed + "," + timeOfTenSearches + "," + timeToTenSearches
-            $('#results').append("<p> " + resultsString + " </p>");
+            timeToTenSearches = Math.ceil(postTenSearchs - preDownload)
+            timeOfTenSearches = Math.ceil(postTenSearchs - postIndexed)
 
-            //console.log(JSON.stringify(res, null, 2));
-
-            res = thinned.search("syntax")
-            //console.log(JSON.stringify(res));
-
-            res = thinned.search("syntax today")
-            //console.log(JSON.stringify(res, null, 2));
-
+        }, function(error){
+            console.log(error)
         });
+        
+        return {
+            numPosts,
+            timeToDownloaded, timeOfDownloading,
+            timeToIndexed, timeOfIndexing,
+            timeToTenSearches, timeOfTenSearches
+        }
     }
 
-    runForPosts("json/thinned.json", 21);
-
+    var results = runForPosts("json/thinned.json", 21);
+    var resultsString = formatString(results);
+    $('#results').append("<p> " + resultsString + " </p>");
 });
