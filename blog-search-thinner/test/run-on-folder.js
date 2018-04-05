@@ -1,9 +1,10 @@
 const fs = require('fs');
 const glob = require('glob');
-const thinnerFunc = require('./index');
+const path = require('path');
+const thinnerFunc = require('../lib/index');
 const lunr = require('lunr');
-
-var folder = process.argv.slice(2)[0];
+var defaultFolder = path.dirname(__filename) + "/posts"
+var folder = process.argv.length > 2 ? process.argv.slice(2)[0] : defaultFolder;
 console.log("folder - " + folder);
 
 let isBadFilePath = function (filePath) {
@@ -12,17 +13,15 @@ let isBadFilePath = function (filePath) {
         || filePath.indexOf("/scss/") !== -1
         || filePath.indexOf("/README.md") !== -1
 };
-var baseDir = "C:\\Dev\\CBurbidge\\WordCount\\";
+var repoDir = (path.resolve(path.dirname(__filename) + "/../../")) + "\\";
+var baseDir = repoDir + "results/"
+var allDir = baseDir + "all/"
 
-var writeToFile = function (fileName, data) {
+console.log("baseDir - " + baseDir);
+
+var writeToFile = function (dir, name, data) {
     var toWrite = JSON.stringify(data);
-    fs.writeFile(baseDir + fileName + ".json", toWrite, function (err) {
-        if (err) {
-            return console.log(err);
-        }
-
-        console.log("The file was saved! - " + fileName);
-    });
+    fs.writeFileSync(dir + name + ".json", toWrite);
 }
 
 var configDefault = {
@@ -74,36 +73,36 @@ var writeFiles = function (files) {
     var goodPaths = files.filter(x => isBadFilePath(x) === false);
 
     var removedNothing = goodPaths.map(x => thinnerRemovesNothing.fromFile(x));
-    //var removedCode = goodPaths.map(x => thinnerRemovesCode.fromFile(x));
-    //var removedCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWords.fromFile(x));
+    var removedCode = goodPaths.map(x => thinnerRemovesCode.fromFile(x));
+    var removedCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWords.fromFile(x));
     var removedDupsAndCodeAndStop = goodPaths.map(x => thinnerRemovesCodeAndStopWordsAndDuplicates.fromFile(x));
     var numFiles = files.length
-    writeToFile(numFiles + "_removedNothing", removedNothing);
-    //writeToFile(numFiles + "_removedCode", removedCode);
-    //writeToFile(numFiles + "_removedCodeAndStop", removedCodeAndStop);
-    writeToFile(numFiles + "_removedDupsAndCodeAndStop", removedDupsAndCodeAndStop);
+    writeToFile(allDir, numFiles + "_RemovedNothing", removedNothing);
+    writeToFile(allDir, numFiles + "_RemovedCode", removedCode);
+    writeToFile(allDir, numFiles + "_RemovedCodeAndStop", removedCodeAndStop);
+    writeToFile(allDir, numFiles + "_RemovedWaste", removedDupsAndCodeAndStop);
 
     var thinner = thinnerFunc()
     var stripper = thinner.getPercentageStripper(removedDupsAndCodeAndStop, 0.8);
-    stripper.writeToFile(baseDir + numFiles + "_wc.json")
+    //stripper.writeToFile(allDir + numFiles + "_WordCount.json")
     var stripped = removedDupsAndCodeAndStop.map(x => stripper.remove(x));
-    writeToFile(numFiles + "_removedDupsAndCodeAndStopStripped", stripped);
+    writeToFile(allDir, numFiles + "_RemovedWasteAndPercentage", stripped);
 
-    var getIndex = function(docs){
+    var getIndex = function (docs) {
         return lunr(function () {
             this.ref('path')
             this.field('text')
-    
+
             docs.forEach(function (doc) {
                 this.add(doc)
             }, this)
         })
     }
 
-    
-    writeToFile(numFiles + "_removedNothingIndex", getIndex(removedNothing));
-    writeToFile(numFiles + "_removedDupsAndCodeAndStopStrippedIndex", getIndex(stripped));
-    
+
+    //writeToFile(allDir, numFiles + "_RemovedNothingIndex", getIndex(removedNothing));
+    writeToFile(allDir, numFiles + "_IndexRemovedWasteAndPercentage", getIndex(stripped));
+
 
     var wordCountToFile = function (fileName, text) {
         function splitByWords(text) {
@@ -149,13 +148,35 @@ var writeFiles = function (files) {
 
 function range1(i) { return i ? range1(i - 1).concat(i) : [] }
 
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+
 glob(folder + "/**/*.md", (err, mdFiles) => {
     glob(folder + "/**/*.html", (err, htmlFiles) => {
-        var files = mdFiles.concat(htmlFiles)
+        var inOrderFiles = mdFiles.concat(htmlFiles)
+        var files = shuffle(inOrderFiles)
         console.log("total files found: " + files.length)
         var range = range1(files.length);
-        var limit = 21
-        var intervals = range.filter(x => x % limit === 0 && x !== 0)
+        var limit = 10
+        var max = 400
+        var intervals = range.filter(x => x % limit === 0 && x !== 0 && x <= max)
         intervals.forEach(x => {
             console.log("run for - " + x)
             var subsetOfFiles = files.slice(0, x)
